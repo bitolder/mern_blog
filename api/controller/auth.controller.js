@@ -30,21 +30,20 @@ export const signin = async (req, res, next) => {
   }
   try {
     const validUser = await User.findOne({ email });
-    if (!validUser) return next(handleError(404, "Wrong credentials!"));
+    if (!validUser) return next(handleError(401, "Wrong credentials!"));
     const validPassword = bcryptjs.compareSync(password, validUser.password);
     if (!validPassword) return next(handleError(401, "Wrong credentials!"));
     const { password: pass, ...userInfo } = validUser._doc;
     const token = jwt.sign({ id: validUser._id }, process.env.JWT_SECRET);
     res
+      .cookie("access_token", token, { httpOnly: true })
       .status(200)
-      .cookie("access_token", token, {
-        httpOnly: true,
-      })
-      .json(userInfo);
+      .json({ ...userInfo });
   } catch (error) {
     next(error);
   }
 };
+
 // export const signin = async (req, res, next) => {
 //   const { email, password } = req.body;
 //   try {
