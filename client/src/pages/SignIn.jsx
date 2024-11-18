@@ -7,8 +7,9 @@ import {
   signInSuccess,
 } from "../redux/user/userSlice";
 import { useDispatch, useSelector } from "react-redux";
+import OAuth from "../components/OAuth";
 export default function SignIn() {
-  const { loading, error } = useSelector((state) => state.user);
+  const { loading, error: errorMessage } = useSelector((state) => state.user);
   const [formData, setFormData] = useState({});
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -95,6 +96,7 @@ export default function SignIn() {
                 "Sign in"
               )}
             </Button>
+            <OAuth />
           </form>
 
           <div className="flex gap-3 items-center text-sm mt-5">
@@ -103,7 +105,7 @@ export default function SignIn() {
               Sign up
             </Link>
           </div>
-          {error && <Alert color="failure">{error}</Alert>}
+          {errorMessage && <Alert color="failure">{errorMessage}</Alert>}
         </div>
       </div>
     </div>
