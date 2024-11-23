@@ -18,8 +18,11 @@ import {
   deleteUserStart,
   deleteUserSuccess,
   deleteUserFailure,
+  signOutUserFailure,
+  signOutUserStart,
+  signOutUserSuccess,
 } from "../redux/user/userSlice.js";
-import { useNavigate } from "react-router-dom";
+
 export default function DashProfile() {
   const [imageFiles, setImageFiles] = useState(null);
   const [imageFilesUrl, setImageFilesUrl] = useState(null);
@@ -32,7 +35,7 @@ export default function DashProfile() {
   const filePickerRef = useRef();
   const { currentUser } = useSelector((state) => state.user);
   const dispatch = useDispatch();
-  const navigate = useNavigate();
+
   const handleImageChange = (e) => {
     const files = e.target.files[0];
     if (files) {
@@ -143,8 +146,7 @@ export default function DashProfile() {
   //     dispatch(updateFailure(error.message));
   //   }
   // };
-  const handleDeleteUser = async (e) => {
-    e.preventDefault();
+  const handleDeleteUser = async () => {
     setShowModal(false);
     try {
       dispatch(deleteUserStart());
@@ -156,10 +158,25 @@ export default function DashProfile() {
         dispatch(deleteUserFailure(data.message));
       } else {
         dispatch(deleteUserSuccess(data));
-        navigate("/");
       }
     } catch (error) {
       dispatch(deleteUserFailure(error.message));
+    }
+  };
+  const handleSignout = async () => {
+    try {
+      dispatch(signOutUserStart());
+      const res = await fetch("/api/user/signout", {
+        method: "POST",
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        dispatch(signOutUserFailure(data.message));
+      } else {
+        dispatch(signOutUserSuccess(data));
+      }
+    } catch (error) {
+      dispatch(signOutUserFailure(error.message));
     }
   };
 
@@ -249,7 +266,10 @@ export default function DashProfile() {
         >
           Delete account
         </span>
-        <span className="cursor-pointer text-red-500"> Sign Out</span>
+        <span className="cursor-pointer text-red-500" onClick={handleSignout}>
+          {" "}
+          Sign Out
+        </span>
       </div>
       {showModal && (
         <Modal
