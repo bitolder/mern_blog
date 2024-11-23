@@ -22,18 +22,21 @@ import {
   signOutUserStart,
   signOutUserSuccess,
 } from "../redux/user/userSlice.js";
+import { Link } from "react-router-dom";
 
 export default function DashProfile() {
   const [imageFiles, setImageFiles] = useState(null);
   const [imageFilesUrl, setImageFilesUrl] = useState(null);
+  const { currentUser, loading } = useSelector((state) => state.user);
   const [formData, setFormData] = useState({});
+  const [formDatacopied, setFormDatacopied] = useState({});
   const [imageUploadProgress, setImageUploadProgress] = useState(null);
   const [imageUploadError, setImageUploadError] = useState(null);
   const [updateUserSuccess, setUpdateUserSuccess] = useState(null);
   const [updateUserError, setUpdateUserError] = useState(null);
   const [showModal, setShowModal] = useState(null);
+  const [uploadImagesProgress, setUploadImagesProgress] = useState(null);
   const filePickerRef = useRef();
-  const { currentUser } = useSelector((state) => state.user);
   const dispatch = useDispatch();
 
   const handleImageChange = (e) => {
@@ -51,12 +54,30 @@ export default function DashProfile() {
       uploadImageFiles();
     }
   }, [imageFiles]);
+
+  useEffect(() => {
+    // Initialise formData avec les données de currentUser
+    if (currentUser) {
+      setFormData({
+        username: currentUser.username || "",
+        email: currentUser.email || "",
+      });
+      const initialData = {
+        username: currentUser.username,
+        email: currentUser.email,
+      };
+      setFormDatacopied({ ...initialData });
+    }
+  }, [currentUser]);
+
   const uploadImageFiles = async () => {
     setImageUploadError(null);
+    setUploadImagesProgress(true);
     const storage = getStorage(app);
     const fileName = new Date().getTime() + imageFiles.name;
     const storageRef = ref(storage, fileName);
     const uploadTask = uploadBytesResumable(storageRef, imageFiles);
+
     uploadTask.on(
       "state_changed",
       (snapshot) => {
@@ -71,11 +92,14 @@ export default function DashProfile() {
         setImageUploadProgress(null);
         setImageFiles(null);
         setImageFilesUrl(null);
+        setUploadImagesProgress(null);
       },
       () => {
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
           setImageFilesUrl(downloadURL);
           setFormData({ ...formData, profilePicture: downloadURL });
+
+          setUploadImagesProgress(null);
         });
       }
     );
@@ -84,21 +108,63 @@ export default function DashProfile() {
     e.preventDefault();
     setUpdateUserSuccess(false);
     setUpdateUserError(null);
-    if (Object.keys(formData).length === 0) {
+    if (
+      Object.values(formData).every(
+        (value, index) => value === Object.values(formDatacopied)[index]
+      )
+    ) {
       setUpdateUserError("no changes were made");
       dispatch(updateFailure("Please fill out all fields."));
       return;
     }
-    if (
-      !formData.username ||
-      !formData.email ||
-      formData.username === " " ||
-      formData.email === " "
-    ) {
-      console.log(formData);
 
-      setUpdateUserError("Field missing");
+    if (!formData.username || !formData.username.match(/^[a-zA-Z0-9]+$/)) {
+      dispatch(
+        updateFailure(" username can only contain letters and numbers.")
+      );
+      setUpdateUserError(" username can only contain letters and numbers.");
       return;
+    }
+
+    if (formData.username.length < 6 || formData.username.length > 20) {
+      dispatch(
+        updateFailure(
+          "Username must be at least 6 characters and less than 20 characters."
+        )
+      );
+      setUpdateUserError(
+        "Username must be at least 6 characters and less than 20 characters."
+      );
+      return;
+    }
+
+    if (!formData.email || !formData.email.match(/^[a-zA-Z0-9._@]+$/)) {
+      dispatch(
+        updateFailure("Email can only contain letters, numbers, @, ., and _.")
+      );
+      setUpdateUserError(
+        "Email can only contain letters, numbers, @, ., and _."
+      );
+      return;
+    }
+
+    if (formData.email.length < 6 || formData.email.length > 20) {
+      dispatch(
+        updateFailure(
+          "Email must be at least 6 characters and less than 20 characters."
+        )
+      );
+      setUpdateUserError(
+        "Email must be at least 6 characters and less than 20 characters."
+      );
+      return;
+    }
+    if (formData.password) {
+      if (formData.password.length < 6) {
+        dispatch(updateFailure("Password must be at least 6 characters"));
+        setUpdateUserError("Password must be at least 6 characters");
+        return;
+      }
     }
     try {
       dispatch(updateStart());
@@ -121,31 +187,6 @@ export default function DashProfile() {
       setUpdateUserSuccess(true);
     }
   };
-
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-
-  //   try {
-  //     dispatch(updateStart());
-  //     const res = await fetch(`/api/user/update/${currentUser._id}`, {
-  //       method: "PUT",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify(formData),
-  //     });
-  //     const data = await res.json();
-  //     console.log(data);
-
-  //     if (!res.ok) {
-  //       dispatch(updateFailure(data.message));
-  //     } else {
-  //       dispatch(updateSuccess(data));
-  //     }
-  //   } catch (error) {
-  //     dispatch(updateFailure(error.message));
-  //   }
-  // };
   const handleDeleteUser = async () => {
     setShowModal(false);
     try {
@@ -251,9 +292,25 @@ export default function DashProfile() {
             onChange={handleFormChange}
           />
         </div>
-        <Button type="submit" gradientDuoTone="purpleToBlue" outline>
-          Update
+        <Button
+          type="submit"
+          gradientDuoTone="purpleToBlue"
+          outline
+          disabled={uploadImagesProgress || loading}
+        >
+          {uploadImagesProgress ? "loading..." : "Update"}
         </Button>
+        {currentUser && currentUser.isAdmin && (
+          <Link to="/create-post">
+            <Button
+              type="button"
+              gradientDuoTone="purpleToPink"
+              className="w-full"
+            >
+              Create Post
+            </Button>
+          </Link>
+        )}
         {updateUserSuccess && (
           <Alert color="success">Profile updated successfully.</Alert>
         )}

@@ -34,7 +34,10 @@ export const signin = async (req, res, next) => {
     const validPassword = bcryptjs.compareSync(password, validUser.password);
     if (!validPassword) return next(handleError(401, "Wrong credentials!"));
     const { password: pass, ...userInfo } = validUser._doc;
-    const token = jwt.sign({ id: validUser._id }, process.env.JWT_SECRET);
+    const token = jwt.sign(
+      { id: validUser._id, isAdmin: validUser.isAdmin },
+      process.env.JWT_SECRET
+    );
     res
       .cookie("access_token", token, { httpOnly: true })
       .status(200)
@@ -50,7 +53,10 @@ export const google = async (req, res, next) => {
     const validUser = await User.findOne({ email });
     if (validUser) {
       const { password, ...userInfo } = validUser._doc;
-      const token = jwt.sign({ id: userInfo._id }, process.env.JWT_SECRET);
+      const token = jwt.sign(
+        { id: userInfo._id, isAdmin: validUser.isAdmin },
+        process.env.JWT_SECRET
+      );
       res
         .cookie("access_token", token, { httpOnly: true })
         .status(200)
@@ -69,7 +75,10 @@ export const google = async (req, res, next) => {
         profilePicture: googlePhotoURL,
       });
       await newuser.save();
-      const token = jwt.sign({ id: newuser._id }, process.env.JWT_SECRET);
+      const token = jwt.sign(
+        { id: newuser._id, isAdmin: validUser.isAdmin },
+        process.env.JWT_SECRET
+      );
       const { password, ...rest } = newuser._doc;
       res
         .cookie("access_token", token, { httpOnly: true })

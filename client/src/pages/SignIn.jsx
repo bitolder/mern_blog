@@ -48,7 +48,7 @@ export default function SignIn() {
   };
   return (
     <div className="min-h-screen mt-20 ">
-      <div className="flex flex-col max-w-3xl md:flex-row gap-5 mx-auto  p-3 md:items-center">
+      <div className="flex flex-col max-w-3xl md:max-w-4xl md:flex-row gap-5 mx-auto  p-3 md:items-center">
         {/*left*/}
         <div className="flex-1">
           <Link to="/" className="text-4xl font-semibold dark:text-white">
