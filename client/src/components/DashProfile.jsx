@@ -106,6 +106,7 @@ export default function DashProfile() {
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log(formData.username.length);
     setUpdateUserSuccess(false);
     setUpdateUserError(null);
     if (
@@ -126,17 +127,17 @@ export default function DashProfile() {
       return;
     }
 
-    if (formData.username.length < 6 || formData.username.length > 20) {
-      dispatch(
-        updateFailure(
-          "Username must be at least 6 characters and less than 20 characters."
-        )
-      );
-      setUpdateUserError(
-        "Username must be at least 6 characters and less than 20 characters."
-      );
-      return;
-    }
+    // if (formData.username.length < 6 || formData.username.length > 20) {
+    //   dispatch(
+    //     updateFailure(
+    //       "Username must be at least 6 characters and less than 20 characters."
+    //     )
+    //   );
+    //   setUpdateUserError(
+    //     "Username must be at least 6 characters and less than 20 characters."
+    //   );
+    //   return;
+    // }
 
     if (!formData.email || !formData.email.match(/^[a-zA-Z0-9._@]+$/)) {
       dispatch(
@@ -148,17 +149,17 @@ export default function DashProfile() {
       return;
     }
 
-    if (formData.email.length < 6 || formData.email.length > 20) {
-      dispatch(
-        updateFailure(
-          "Email must be at least 6 characters and less than 20 characters."
-        )
-      );
-      setUpdateUserError(
-        "Email must be at least 6 characters and less than 20 characters."
-      );
-      return;
-    }
+    // if (formData.email.length < 6 || formData.email.length > 20) {
+    //   dispatch(
+    //     updateFailure(
+    //       "Email must be at least 6 characters and less than 20 characters."
+    //     )
+    //   );
+    //   setUpdateUserError(
+    //     "Email must be at least 6 characters and less than 20 characters."
+    //   );
+    //   return;
+    // }
     if (formData.password) {
       if (formData.password.length < 6) {
         dispatch(updateFailure("Password must be at least 6 characters"));
