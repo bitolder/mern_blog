@@ -97,8 +97,8 @@ export default function CreatePost() {
       <h1 className="text-3xl font-bold text-center mx-auto my-16">
         Create a post
       </h1>
-      <form onSubmit={handleSubmit}>
-        <div className="flex flex-col sm:flex-row">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+        <div className="flex flex-col gap-4 sm:flex-row">
           <TextInput
             className="flex-1"
             type="text"
@@ -168,10 +168,74 @@ export default function CreatePost() {
         <CKEditor
           editor={ClassicEditor}
           config={{
-            placeholder: "Write something...", // Placeholder personnalisé?
+            placeholder: "Write something...",
+            toolbar: [
+              "undo",
+              "redo",
+              "bold",
+              "italic",
+              "link",
+
+              "blockQuote",
+              "numberedList",
+              "bulletedList",
+              "heading",
+              "blockQuote",
+            ],
           }}
           onChange={handleEditorChange}
         />
+        {/* <CKEditor
+          editor={ClassicEditor}
+          config={{
+            placeholder: "Write something...",
+            toolbar: [
+              "undo",
+              "redo",
+              "bold",
+              "italic",
+              "link",
+
+              "blockQuote",
+              "numberedList",
+              "bulletedList",
+              "heading",
+              "alignment",
+              "fontSize",
+            ],
+            heading: {
+              options: [
+                {
+                  model: "paragraph",
+                  title: "Paragraph",
+                  class: "ck-heading_paragraph",
+                },
+                {
+                  model: "heading1",
+                  view: "h1",
+                  title: "Heading 1",
+                  class: "ck-heading_heading1",
+                },
+                {
+                  model: "heading2",
+                  view: "h2",
+                  title: "Heading 2",
+                  class: "ck-heading_heading2",
+                },
+                {
+                  model: "heading3",
+                  view: "h3",
+                  title: "Heading 3",
+                  class: "ck-heading_heading3",
+                },
+              ],
+            },
+            fontSize: {
+              options: ["default", "small", "big", "huge"], // Personnalisez selon vos besoins
+            },
+          }}
+          onChange={handleEditorChange}
+        /> */}
         <style>
           {`
           .ck-editor__editable_inline {
