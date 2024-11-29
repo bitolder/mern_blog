@@ -140,3 +140,33 @@ export const signoutUser = async (req, res, next) => {
   res.clearCookie("access_token", { httpOnly: true });
   res.status(200).json({ message: "User signed out successfully" });
 };
+export const getUsers = async (req, res, next) => {
+  if (!req.user.isAdmin)
+    return next(handleError(403, "You are not authorized"));
+  try {
+    const orderDirection = req.query.orderDirection === "asc" ? 1 : -1;
+    const startIndex = req.query.startIndex || 0;
+    const limit = req.query.limit || 9;
+    const users = await User.find()
+      .sort({ createdAt: orderDirection })
+      .skip(startIndex)
+      .limit(limit);
+    const usersWithoutPassword = users.map((users) => {
+      const { password, ...rest } = users._doc;
+      return rest;
+    });
+    res.status(200).json(usersWithoutPassword);
+  } catch (error) {
+    next(error);
+  }
+};
+export const adminDeleteUser = async (req, res, next) => {
+  if (!req.user.isAdmin || req.user.id !== req.params.idAdmin)
+    return next(handleError(403, "You are not authorized"));
+  try {
+    await User.findByIdAndDelete(req.params.idUser);
+    res.status(200).json("User deleted successfully");
+  } catch (error) {
+    next(error);
+  }
+};

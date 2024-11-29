@@ -15,7 +15,11 @@
 
 .ck-content p {
   font-size: 1.1rem;
+  @apply dark:text-black;
 }
 .ck-content a {
   @apply text-blue-500 hover:text-blue-600 underline;
 }
+/* .ck.ck-toolbar.ck-toolbar_grouping {
+  @apply dark:bg-custom-gray;
+} */
