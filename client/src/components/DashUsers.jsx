@@ -131,7 +131,7 @@ export default function Dashusers() {
           </Table>
         </>
       ) : (
-        <p> No posts yet </p>
+        <p> No Users</p>
       )}
       {showMore && (
         <button

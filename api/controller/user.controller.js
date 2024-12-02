@@ -155,6 +155,18 @@ export const getUsers = async (req, res, next) => {
       const { password, ...rest } = users._doc;
       return rest;
     });
+    const totalUsers = await User.countDocuments();
+
+    const now = new Date();
+
+    const oneMonthAgo = new Date(
+      now.getFullYear(),
+      now.getMonth() - 1,
+      now.getDate()
+    );
+    const lastMonthUsers = await User.countDocuments({
+      createdAt: { $gte: oneMonthAgo },
+    });
     res.status(200).json(usersWithoutPassword);
   } catch (error) {
     next(error);
@@ -169,4 +181,12 @@ export const adminDeleteUser = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
+};
+export const getUserWhoCommented = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.params.userId);
+    if (!user) return next(handleError(404, "User not found"));
+    const { password, ...rest } = user._doc;
+    res.status(200).json(rest);
+  } catch (error) {}
 };

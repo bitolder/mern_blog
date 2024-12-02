@@ -30,6 +30,7 @@ export default function UpdatePost() {
   const { currentUser } = useSelector((state) => state.user);
   const params = useParams();
   const idpostFromUrl = params.postId;
+  console.log(formData);
 
   useEffect(() => {
     const fetchUpdatePost = async () => {

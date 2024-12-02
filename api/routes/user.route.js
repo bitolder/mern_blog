@@ -6,6 +6,7 @@ import {
   test,
   updateUser,
   adminDeleteUser,
+  getUserWhoCommented,
 } from "../controller/user.controller.js";
 import { verifyToken } from "../utils/verifyUsers.js";
 
@@ -16,5 +17,6 @@ router.delete("/delete/:id", verifyToken, deleteUser);
 router.post("/signout", signoutUser);
 router.get("/getUsers", verifyToken, getUsers);
 router.delete("/delete/:idUser/:idAdmin", verifyToken, adminDeleteUser);
+router.get("/:userId", getUserWhoCommented);
 
 export default router;

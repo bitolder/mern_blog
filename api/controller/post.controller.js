@@ -97,6 +97,7 @@ export const updatePost = async (req, res, next) => {
         $set: {
           title: req.body.title,
           content: req.body.content,
+          category: req.body.category,
           updatedAt: new Date(),
           slug: req.body.title
             .split(" ")

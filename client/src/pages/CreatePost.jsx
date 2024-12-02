@@ -2,6 +2,7 @@ import { TextInput, Select, Button, FileInput, Alert } from "flowbite-react";
 import { useState } from "react";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+
 import {
   getDownloadURL,
   getStorage,
@@ -175,8 +176,6 @@ export default function CreatePost() {
               "bold",
               "italic",
               "link",
-
-              "blockQuote",
               "numberedList",
               "bulletedList",
               "heading",
