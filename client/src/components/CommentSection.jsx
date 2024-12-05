@@ -3,13 +3,42 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import CommentPost from "./CommentPost";
+import { set } from "mongoose";
 
 export default function CommentSection({ postId }) {
   const { currentUser } = useSelector((state) => state.user);
-  const [comment, setComment] = useState("");
+  const [comment, setComment] = useState([]);
   const [commentPost, setCommentPost] = useState([]);
-  //console.log(commentPost);
 
+  const handleLike = async (commentId) => {
+    if (!currentUser) return;
+    console.log(commentId);
+    try {
+      const res = await fetch(`/api/comment/likeComment/${commentId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        // setCommentPost(data);
+        setCommentPost(
+          commentPost.map((comment) =>
+            comment._id === commentId
+              ? {
+                  ...comment,
+                  likes: data.likes,
+                  numberOfLikes: data.likes.length,
+                }
+              : comment
+          )
+        );
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -33,6 +62,18 @@ export default function CommentSection({ postId }) {
       console.log(error);
     }
   };
+  const handleEditComment = async (comment, editCommentContent) => {
+    console.log(comment);
+
+    setCommentPost(
+      commentPost.map((c) =>
+        c._id === comment._id ? { ...c, comment: editCommentContent } : c
+      )
+    );
+  };
+  const handleDeleteComment = (deletedComment) => {
+    setCommentPost(commentPost.filter((comm) => deletedComment !== comm._id));
+  };
   useEffect(() => {
     const fetchgetCommentPost = async () => {
       const res = await fetch(`/api/comment/getCommentPost/${postId}`);
@@ -43,6 +84,7 @@ export default function CommentSection({ postId }) {
     };
     fetchgetCommentPost();
   }, [postId]);
+
   return (
     <div className="p-12 flex flex-col">
       <div>
@@ -108,7 +150,15 @@ export default function CommentSection({ postId }) {
             </div>
           </div>
           {commentPost.map((comment) => {
-            return <CommentPost key={comment._id} comment={comment} />;
+            return (
+              <CommentPost
+                key={comment._id}
+                comment={comment}
+                onLike={handleLike}
+                onEdit={handleEditComment}
+                onDelete={handleDeleteComment}
+              />
+            );
           })}
         </>
       )}
